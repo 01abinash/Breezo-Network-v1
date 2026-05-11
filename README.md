@@ -1,314 +1,715 @@
-# BREEZO Network
+# 🌿 BREEZO Network
 
-Decentralized air quality monitoring infrastructure for South Asia.
+<div align="center">
 
-**Live data** from the [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) — free, no API key required.
+## Hyperlocal Air Quality DePIN on Solana
 
----
+**BREEZO** is a decentralized physical infrastructure network (DePIN) for real-world air quality monitoring powered by Solana.
 
-## Tech Stack
-
-| Layer        | Technology                                  |
-|--------------|---------------------------------------------|
-| Framework    | React 18 + Vite                             |
-| Routing      | React Router v6                             |
-| Charts       | Recharts                                    |
-| Icons        | Lucide React                                |
-| Styling      | CSS Modules (no Tailwind, no UI library)    |
-| Data         | Open-Meteo Air Quality API (free, no key)   |
-| Fonts        | Bricolage Grotesque + DM Mono (Google Fonts)|
+Physical ESP32 sensor nodes collect environmental data such as PM2.5, PM10, AQI, temperature, and humidity. Operators earn **BREEZO tokens** for contributing verifiable environmental data, while developers and users access live hyperlocal insights through dashboards, APIs, and chat interfaces.
 
 ---
 
-## Getting Started
+**Built for cleaner cities, open environmental data, and decentralized infrastructure.**
 
-```bash
-# 1. Install dependencies
-npm install
+</div>
 
-# 2. Start dev server
-npm run dev
+---
 
-# 3. Build for production
-npm run build
+# 📋 Table of Contents
 
-# 4. Preview production build
-npm run preview
+* [Overview](#-overview)
+* [Problem Statement](#-problem-statement)
+* [Key Features](#-key-features)
+* [Architecture](#-architecture)
+* [System Flow](#-system-flow)
+* [Backend — NodeService](#-backend--nodeservice)
+* [Smart Contract](#-smart-contract)
+* [Telegram & Premium Payments](#-telegram--premium-payments)
+* [Reward Engine](#-reward-engine)
+* [Security](#-security)
+* [Project Structure](#-project-structure)
+* [Getting Started](#-getting-started)
+* [Environment Variables](#-environment-variables)
+* [API Overview](#-api-overview)
+* [Tech Stack](#-tech-stack)
+* [Future Vision](#-future-vision)
+* [License](#-license)
+
+---
+
+# 🌍 Overview
+
+South Asian cities face severe air pollution, yet most existing AQI systems only provide city-wide averages rather than street-level environmental visibility.
+
+BREEZO solves this by combining:
+
+* 🌿 Real ESP32 air quality sensors
+* ⚡ Node.js + MongoDB backend
+* ⛓️ Solana smart contracts with Anchor
+* 💰 Tokenized reward incentives
+* 🤖 Telegram & WhatsApp premium AI access
+* 📊 Real-time dashboards and APIs
+
+The result is a fully decentralized environmental data economy where physical infrastructure earns on-chain rewards.
+
+---
+
+# 🚨 Problem Statement
+
+Existing environmental monitoring systems are often:
+
+* centralized and opaque
+* expensive to deploy
+* lacking real-time neighborhood visibility
+* difficult to integrate into open developer ecosystems
+* missing incentives for physical sensor deployment
+
+Citizens need hyperlocal environmental data.
+
+Sensor operators need incentives.
+
+Developers need open programmable infrastructure.
+
+BREEZO provides all three.
+
+---
+
+# ✨ Key Features
+
+## 🌿 Hyperlocal Air Quality Monitoring
+
+ESP32 devices publish:
+
+* PM2.5
+* PM10
+* AQI
+* Temperature
+* Humidity
+
+with real-time ingestion and visualization.
+
+---
+
+## ⛓️ Solana-Powered DePIN Rewards
+
+Sensor operators earn **BREEZO tokens** for contributing useful environmental data.
+
+Rewards are:
+
+* calculated automatically
+* synced on-chain
+* claimable directly to user wallets
+
+---
+
+## 🔐 Secure Device Verification
+
+Every device submission is:
+
+* signed using NaCl cryptographic signatures
+* replay-protected using timestamps
+* validated before storage or rewards
+
+Only authentic hardware can submit valid data.
+
+---
+
+## 📡 Real-Time Dashboard
+
+The React frontend provides:
+
+* live AQI updates
+* network map visualization
+* node dashboards
+* reward balances
+* claim interfaces
+* historical metrics
+
+---
+
+## 🤖 Telegram & WhatsApp Premium AI
+
+Users can:
+
+* query nearby AQI
+* ask AI-powered environmental questions
+* unlock premium requests via Solana Pay
+
+Payments are verified automatically using transaction memos and Helius indexing.
+
+---
+
+# 🏗 Architecture
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│                           BREEZO Network                            │
+├──────────────┬────────────────────────┬──────────────────────────────┤
+│   Hardware   │        Backend         │          Blockchain          │
+│              │                        │                              │
+│  ESP32       │  Node.js + Express     │  Solana + Anchor Program    │
+│  Sensors     │  MongoDB + Socket.IO   │  SPL Token                  │
+│              │                        │                              │
+│ PM2.5  ──────┼─► ingestData()         │                              │
+│ PM10         │  verifySignature() ────┼─► Node PDA                  │
+│ Temp         │  calculateReward()     │   rewardBalance             │
+│ Humidity     │  syncToSolana() ───────┼─► addReward()               │
+│ AQI          │                        │   claimReward()             │
+│              │                        │                              │
+│              │ REST API               │ Treasury PDA                │
+│              │ Dashboard Updates      │ SPL Transfers               │
+│              │ Telegram Bot           │                              │
+└──────────────┴────────────────────────┴──────────────────────────────┘
 ```
 
-The app runs at `http://localhost:5173` by default.
-
 ---
 
-## Project Structure
+# ⚙️ System Flow
 
-```
-breezo/
-├── index.html                    # Entry HTML, font imports
-├── package.json
-├── vite.config.js
-│
-└── src/
-    ├── main.jsx                  # React root, BrowserRouter
-    ├── App.jsx                   # Route definitions
-    ├── index.css                 # Global CSS variables + resets
-    │
-    ├── lib/
-    │   └── aqi.js                # AQI math, city coords, WHO limits, forecast logic
-    │
-    ├── hooks/
-    │   ├── useAirQuality.js      # Data fetching + 5-min cache
-    │   └── useScrollReveal.js    # Intersection Observer + counter animation
-    │
-    ├── components/
-    │   ├── layout/
-    │   │   ├── Layout.jsx        # Navbar + Footer wrapper
-    │   │   ├── Navbar.jsx        # Fixed nav with mobile hamburger
-    │   │   └── Footer.jsx
-    │   │
-    │   ├── ui/
-    │   │   └── UI.jsx            # Button, Chip, LivePill, SectionLabel, etc.
-    │   │
-    │   ├── home/
-    │   │   ├── Hero.jsx          # Landing hero with live AQI panel + canvas
-    │   │   ├── StatsBelt.jsx     # 4-stat animated counter row
-    │   │   ├── CrisisSection.jsx # South Asia crisis stats
-    │   │   ├── HowItWorks.jsx    # 4-step process grid
-    │   │   ├── DepinSection.jsx  # DePIN 3-layer cards + token orbit viz
-    │   │   └── VisionCTA.jsx     # Vision cards + CTA section
-    │   │
-    │   └── dashboard/
-    │       ├── CitySelector.jsx      # City pill buttons
-    │       ├── AQIHeroCard.jsx       # Big AQI number + health tip
-    │       ├── MetricsGrid.jsx       # 6 pollutant cards with bars
-    │       ├── TrendChart.jsx        # Recharts 24h area chart
-    │       ├── ForecastRow.jsx       # 7-day forecast cards
-    │       ├── WHOBars.jsx           # WHO compliance progress bars
-    │       ├── HealthCards.jsx       # 4 health recommendation cards
-    │       └── CityCompareChart.jsx  # Recharts bar chart — 6 cities
-    │
-    └── pages/
-        ├── HomePage.jsx          # Assembles all home sections
-        ├── DashboardPage.jsx     # Full dashboard layout
-        ├── NetworkPage.jsx       # Network info + specs + roadmap
-        └── AboutPage.jsx         # About, problem, team, mission
+## 1️⃣ Node Registration
+
+Admin registers an ESP32 sensor:
+
+```text
+createNode()
 ```
 
----
+This creates:
 
-## Data Sources
-
-### Air Quality API
-- **Provider**: [Open-Meteo](https://open-meteo.com/en/docs/air-quality-api)
-- **Free**: Yes — no API key, no rate limit for reasonable usage
-- **Endpoint**: `https://air-quality-api.open-meteo.com/v1/air-quality`
-- **Parameters**: `pm2_5`, `nitrogen_dioxide`, `ozone`, `carbon_monoxide`, `sulphur_dioxide`
-- **Coverage**: Global, hourly, 7-day forecast + 1-day historical
-- **Cache**: 5 minutes in-memory per city key
-
-### Cities Monitored
-| Key  | City       | Country    | Coordinates          |
-|------|------------|------------|----------------------|
-| ktm  | Kathmandu  | Nepal      | 27.717N, 85.317E     |
-| pkr  | Pokhara    | Nepal      | 28.209N, 83.985E     |
-| del  | Delhi      | India      | 28.644N, 77.216E     |
-| mum  | Mumbai     | India      | 19.076N, 72.877E     |
-| lko  | Lahore     | Pakistan   | 31.549N, 74.343E     |
-| dac  | Dhaka      | Bangladesh | 23.810N, 90.412E     |
-
-### AQI Calculation
-Uses the **US EPA AQI formula** based on PM2.5 concentration breakpoints.
-
-### WHO Limits Used
-| Pollutant | WHO Annual Mean Guideline |
-|-----------|--------------------------|
-| PM2.5     | 5 μg/m³                  |
-| NO₂       | 10 μg/m³                 |
-| SO₂       | 40 μg/m³                 |
-| O₃        | 100 μg/m³ (8-hour mean)  |
+* MongoDB node record
+* empty latest-state document
+* optional on-chain PDA
 
 ---
 
-## Adding More Cities
+## 2️⃣ Sensor Ingestion
 
-In `src/lib/aqi.js`, add to the `CITIES` object:
+ESP32 devices send signed payloads:
 
-```js
-export const CITIES = {
-  // existing...
-  cbm: { key: 'cbm', name: 'COLOMBO, SRI LANKA', label: 'Colombo', lat: 6.927, lon: 79.861 },
+```json
+{
+  "nodeId": "abc123",
+  "pm25": 12.4,
+  "pm10": 18.7,
+  "temp": 28.5,
+  "humidity": 64,
+  "aqi": 90,
+  "timestamp": 1714298320,
+  "signature": "base64encoded..."
 }
 ```
 
-Then add `'cbm'` to `DISPLAY_CITIES` in `src/components/dashboard/CitySelector.jsx`.
+Backend processing:
 
----
-
-## Deployment
-
-### Vercel (recommended)
-```bash
-npm i -g vercel
-vercel
+```text
+ingestData()
+ ├─ Verify timestamp
+ ├─ Verify NaCl signature
+ ├─ Store latest reading
+ ├─ Calculate reward
+ └─ Sync to Solana if threshold reached
 ```
 
-### Netlify
-```bash
-npm run build
-# Deploy the dist/ folder
+---
+
+## 3️⃣ Reward Synchronization
+
+Once reward accumulation reaches threshold:
+
+```text
+syncToSolana()
+  └─ addReward(amount)
 ```
 
-### Environment Variables
-None required — the Open-Meteo API is fully public.
+Rewards are credited to the node PDA on Solana.
 
 ---
 
-## License
+## 4️⃣ User Claim Flow
 
-MIT — build on it, fork it, deploy it.
-# BREEZO Network
+Users claim rewards from the frontend:
 
-Decentralized air quality monitoring infrastructure for South Asia.
-
-**Live data** from the [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) — free, no API key required.
-
----
-
-## Tech Stack
-
-| Layer        | Technology                                  |
-|--------------|---------------------------------------------|
-| Framework    | React 18 + Vite                             |
-| Routing      | React Router v6                             |
-| Charts       | Recharts                                    |
-| Icons        | Lucide React                                |
-| Styling      | CSS Modules (no Tailwind, no UI library)    |
-| Data         | Open-Meteo Air Quality API (free, no key)   |
-| Fonts        | Bricolage Grotesque + DM Mono (Google Fonts)|
-
----
-
-## Getting Started
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Start dev server
-npm run dev
-
-# 3. Build for production
-npm run build
-
-# 4. Preview production build
-npm run preview
+```text
+claimReward()
+ ├─ Verify wallet ownership
+ ├─ Check reward balance
+ └─ SPL transfer: Treasury → User ATA
 ```
 
-The app runs at `http://localhost:5173` by default.
+---
+
+## 5️⃣ Premium Chat Access
+
+Telegram / WhatsApp flow:
+
+```text
+User exceeds free quota
+        │
+        ▼
+Generate Solana Pay QR
+        │
+        ▼
+User pays BREEZO tokens
+        │
+        ▼
+Poller verifies payment via Helius
+        │
+        ▼
+Premium requests unlocked
+```
 
 ---
 
-## Project Structure
+# 🧠 Backend — NodeService
 
+The `NodeService` is the core orchestration layer of BREEZO.
+
+It handles:
+
+* sensor ingestion
+* signature verification
+* reward calculation
+* Solana synchronization
+* claim handling
+* dashboard aggregation
+
+---
+
+## `ingestData()`
+
+Receives sensor payloads from ESP32 devices.
+
+### Responsibilities
+
+* validates node ownership
+* prevents replay attacks
+* verifies NaCl signatures
+* updates live sensor state
+* calculates rewards
+* triggers async Solana sync
+
+---
+
+## `createNodeOnChain()`
+
+Creates the Solana PDA for a device.
+
+### PDA Seeds
+
+```text
+["node", ownerPubkey, devicePubkey]
 ```
-breezo/
-├── index.html                    # Entry HTML, font imports
-├── package.json
-├── vite.config.js
+
+Stores:
+
+* owner wallet
+* device public key
+* reward balance
+
+---
+
+## `syncToSolanaAsync()`
+
+Non-blocking wrapper around Solana reward sync.
+
+### Guarantees
+
+* ingestion never blocks
+* syncing flag always resets
+* backend never deadlocks on failed syncs
+
+---
+
+## `syncToSolana()`
+
+Performs actual on-chain reward writes.
+
+### Security Checks
+
+* verifies on-chain ownership
+* prevents tampering
+* credits reward balance securely
+
+---
+
+## `claimReward()`
+
+Transfers BREEZO tokens from treasury to user wallet.
+
+### Flow
+
+```text
+Treasury ATA → User ATA
+```
+
+after successful verification.
+
+---
+
+## `getUserDashboard()`
+
+Returns:
+
+* all user nodes
+* latest readings
+* AQI metrics
+* reward balances
+* claim states
+
+Used by the React dashboard.
+
+---
+
+# ⛓️ Smart Contract
+
+The Anchor program powers BREEZO’s on-chain reward system.
+
+## Program ID
+
+```text
+2CZ1WzjHhgbBFaRaTxhLpdKQKAEsYDFga6bbuQRHfCJu
+```
+
+---
+
+## Instructions
+
+| Instruction        | Description                  |
+| ------------------ | ---------------------------- |
+| `initNode`         | Creates node PDA             |
+| `addReward`        | Credits reward balance       |
+| `claimReward`      | Transfers SPL tokens to user |
+| `buyProduct`       | Premium/API purchases        |
+| `withdrawTreasury` | Admin treasury withdrawal    |
+
+---
+
+## NodeAccount Structure
+
+```rust
+NodeAccount {
+  owner: Pubkey,
+  devicePublicKey: Pubkey,
+  rewardBalance: u64,
+  bump: u8
+}
+```
+
+---
+
+## Treasury PDA
+
+```text
+Seed: ["treasury"]
+```
+
+Stores BREEZO token liquidity for claims.
+
+---
+
+## Key Addresses
+
+| Name         | Address                                        |
+| ------------ | ---------------------------------------------- |
+| Program ID   | `2CZ1WzjHhgbBFaRaTxhLpdKQKAEsYDFga6bbuQRHfCJu` |
+| BREEZO Mint  | `soQUnxjoEMCMxBroyS4AvrtVn2JCtPZnR3N53NA5AvU`  |
+| Admin Wallet | `4faW5GHsCXwGgQAMmAL7sSENpaezCb63cncWvzGc8iJa` |
+
+---
+
+# 🤖 Telegram & Premium Payments
+
+BREEZO includes a Telegram/WhatsApp payment system for premium AI usage.
+
+---
+
+## Features
+
+* location-aware AQI responses
+* AI environmental assistant
+* Solana Pay QR generation
+* automatic payment verification
+* premium usage unlocks
+
+---
+
+## Payment Details
+
+| Property     | Value                     |
+| ------------ | ------------------------- |
+| Token        | BREEZO                    |
+| Cost         | 10 BREEZO                 |
+| Unlocks      | 100 premium requests      |
+| Expiry       | 15 minutes                |
+| Verification | Helius + transaction memo |
+
+---
+
+## Verification Flow
+
+Background poller:
+
+* fetches treasury transactions
+* verifies memo
+* validates token mint + amount
+* upgrades user automatically
+
+---
+
+# 💰 Reward Engine
+
+Rewards incentivize useful air quality data.
+
+```js
+function calculateReward(pm25) {
+  if (pm25 < 50) return 0.02
+  if (pm25 < 100) return 0.01
+  if (pm25 < 300) return 0.005
+  return 0
+}
+```
+
+| PM2.5 Range | Air Quality | Reward         |
+| ----------- | ----------- | -------------- |
+| `< 50`      | 🟢 Clean    | `0.02 BREEZO`  |
+| `50 – 100`  | 🟡 Moderate | `0.01 BREEZO`  |
+| `100 – 300` | 🔴 Polluted | `0.005 BREEZO` |
+| `> 300`     | ⚫ Hazardous | `0 BREEZO`     |
+
+---
+
+# 🔐 Security
+
+BREEZO includes multiple protection layers.
+
+## Replay Attack Protection
+
+Sensor packets older than 60 seconds are rejected.
+
+---
+
+## NaCl Signature Verification
+
+Only legitimate hardware devices can publish readings.
+
+---
+
+## On-Chain Ownership Validation
+
+Backend validates:
+
+```text
+node.owner === expectedWallet
+```
+
+before syncing rewards.
+
+---
+
+## PDA-Based Treasury Authority
+
+Treasury funds move only through verified program instructions.
+
+---
+
+## Admin-Protected Withdrawals
+
+Only the admin wallet can execute treasury withdrawals.
+
+---
+
+# 📁 Project Structure
+
+```text
+/
+├── breezo/                    # React frontend
+│   ├── package.json
+│   ├── vite.config.js
+│   └── src/
 │
-└── src/
-    ├── main.jsx                  # React root, BrowserRouter
-    ├── App.jsx                   # Route definitions
-    ├── index.css                 # Global CSS variables + resets
-    │
-    ├── lib/
-    │   └── aqi.js                # AQI math, city coords, WHO limits, forecast logic
-    │
-    ├── hooks/
-    │   ├── useAirQuality.js      # Data fetching + 5-min cache
-    │   └── useScrollReveal.js    # Intersection Observer + counter animation
-    │
-    ├── components/
-    │   ├── layout/
-    │   │   ├── Layout.jsx        # Navbar + Footer wrapper
-    │   │   ├── Navbar.jsx        # Fixed nav with mobile hamburger
-    │   │   └── Footer.jsx
-    │   │
-    │   ├── ui/
-    │   │   └── UI.jsx            # Button, Chip, LivePill, SectionLabel, etc.
-    │   │
-    │   ├── home/
-    │   │   ├── Hero.jsx          # Landing hero with live AQI panel + canvas
-    │   │   ├── StatsBelt.jsx     # 4-stat animated counter row
-    │   │   ├── CrisisSection.jsx # South Asia crisis stats
-    │   │   ├── HowItWorks.jsx    # 4-step process grid
-    │   │   ├── DepinSection.jsx  # DePIN 3-layer cards + token orbit viz
-    │   │   └── VisionCTA.jsx     # Vision cards + CTA section
-    │   │
-    │   └── dashboard/
-    │       ├── CitySelector.jsx      # City pill buttons
-    │       ├── AQIHeroCard.jsx       # Big AQI number + health tip
-    │       ├── MetricsGrid.jsx       # 6 pollutant cards with bars
-    │       ├── TrendChart.jsx        # Recharts 24h area chart
-    │       ├── ForecastRow.jsx       # 7-day forecast cards
-    │       ├── WHOBars.jsx           # WHO compliance progress bars
-    │       ├── HealthCards.jsx       # 4 health recommendation cards
-    │       └── CityCompareChart.jsx  # Recharts bar chart — 6 cities
-    │
-    └── pages/
-        ├── HomePage.jsx          # Assembles all home sections
-        ├── DashboardPage.jsx     # Full dashboard layout
-        ├── NetworkPage.jsx       # Network info + specs + roadmap
-        └── AboutPage.jsx         # About, problem, team, mission
+├── server/                    # Node.js backend
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│
+├── program/                   # Anchor smart contract
+│   ├── programs/
+│   ├── tests/
+│   └── Anchor.toml
+│
+└── hardware/                  # ESP32 firmware
+    └── sensor-code/
 ```
 
 ---
 
-## Data Sources
+# 🚀 Getting Started
 
-### Air Quality API
-- **Provider**: [Open-Meteo](https://open-meteo.com/en/docs/air-quality-api)
-- **Free**: Yes — no API key, no rate limit for reasonable usage
-- **Endpoint**: `https://air-quality-api.open-meteo.com/v1/air-quality`
-- **Parameters**: `pm2_5`, `nitrogen_dioxide`, `ozone`, `carbon_monoxide`, `sulphur_dioxide`
-- **Coverage**: Global, hourly, 7-day forecast + 1-day historical
-- **Cache**: 5 minutes in-memory per city key
+# Prerequisites
 
-
-### AQI Calculation
-Uses the **US EPA AQI formula** based on PM2.5 concentration breakpoints.
-
-### WHO Limits Used
-| Pollutant | WHO Annual Mean Guideline |
-|-----------|--------------------------|
-| PM2.5     | 5 μg/m³                  |
-| NO₂       | 10 μg/m³                 |
-| SO₂       | 40 μg/m³                 |
-| O₃        | 100 μg/m³ (8-hour mean)  |
+* Node.js ≥ 18
+* MongoDB
+* Solana CLI
+* Anchor CLI
+* Funded Solana wallet
 
 ---
 
+# Clone Repository
 
-
-## Deployment
-
-### Vercel (recommended)
 ```bash
-npm i -g vercel
-vercel
+git clone https://github.com/your-org/breezo-network
+cd breezo-network
 ```
-
-### Netlify
-```bash
-npm run build
-# Deploy the dist/ folder
-```
-
-### Environment Variables
-None required — the Open-Meteo API is fully public.
 
 ---
 
-## License
+# Frontend Setup
 
-MIT — build on it, fork it, deploy it.
+```bash
+cd breezo
+npm install
+npm run dev
+```
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# Backend Setup
+
+```bash
+cd server
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Starts:
+
+* Express API
+* Socket.IO
+* Telegram bot
+* payment poller
+
+---
+
+# Smart Contract Deployment
+
+```bash
+cd program
+
+anchor build
+anchor deploy --provider.cluster devnet
+```
+
+---
+
+# Treasury Initialization
+
+```bash
+node scripts/initTreasury.js
+```
+
+Fund treasury:
+
+```bash
+spl-token transfer <MINT> 10000 <TREASURY_ATA> --fund-recipient
+```
+
+---
+
+# 🔧 Environment Variables
+
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://...
+
+# Solana
+SOLANA_RPC=https://api.devnet.solana.com
+PROGRAM_ID=2CZ1WzjHhgbBFaRaTxhLpdKQKAEsYDFga6bbuQRHfCJu
+
+# Backend Authority
+BACKEND_KEYPAIR=[...]
+
+# Treasury
+SOLANA_TREASURY_WALLET=<wallet>
+
+# Token
+BREEZO_TOKEN_MINT=soQUnxjoEMCMxBroyS4AvrtVn2JCtPZnR3N53NA5AvU
+
+# Telegram / Payments
+TELEGRAM_BOT_TOKEN=<token>
+HELIUS_API_KEY=<helius>
+
+# AI
+AI_API_KEY=<provider_key>
+
+# Auth
+JWT_SECRET=<jwt_secret>
+```
+
+---
+
+# 🌐 API Overview
+
+| Endpoint      | Purpose                  |
+| ------------- | ------------------------ |
+| `/nodes`      | Node management          |
+| `/weather/*`  | AQI + environmental APIs |
+| `/credit/add` | Reward sync              |
+| `/claim`      | Claim rewards            |
+| `/dashboard`  | User dashboard           |
+| `/telegram/*` | Bot + payments           |
+
+---
+
+# 🧰 Tech Stack
+
+| Layer      | Technology                          |
+| ---------- | ----------------------------------- |
+| Hardware   | ESP32, C++, NaCl                    |
+| Backend    | Node.js, Express, MongoDB, Mongoose |
+| Real-Time  | Socket.IO                           |
+| Blockchain | Solana, Anchor, SPL Token           |
+| Frontend   | React, Vite, Recharts               |
+| Wallets    | `@solana/wallet-adapter`            |
+| Auth       | JWT                                 |
+| Payments   | Solana Pay, Helius                  |
+| AI         | LLM Integration                     |
+| Deployment | Docker, VPS / Cloud                 |
+
+---
+
+# 🔮 Future Vision
+
+* global hyperlocal AQI network
+* on-chain environmental analytics
+* DAO-governed sensor incentives
+* AI-powered pollution prediction
+* carbon and sustainability integrations
+* mobile-native citizen dashboards
+* decentralized environmental marketplace
+
+---
+
+# 📜 License
+
+MIT License
+
+See `LICENSE` for details.
+
+---
+
+<div align="center">
+
+## 🌿 Built with BREEZO
+
+### Clean Air • Open Data • Decentralized Infrastructure
+
+</div>
